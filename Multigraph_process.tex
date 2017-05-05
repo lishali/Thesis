@@ -1,0 +1,187 @@
+\chapter{Concentration Inequalities for Observed Multigraph Process}
+
+\section{Markov Chain Preliminaries}
+
+Recall that a discrete state Markov Chain is a sequence of random variables $X_1, X_2, X_3...$ with the property that the probability of moving to the next state only depends on the previous state.  This is commonly referred to as the Markov property.  More formally $$ \mathbb{P}(X_{n+1} = x | X_1 = x_1, X_2 = x_2, ..., X_n = x_n) =P(X_{n+1} = x | X_n = x_n)$$ where $x, x_i \in S$, the countable state space of possible values of $X_i's$.  
+
+\section{Multigraph Process Formulation}
+
+Recall that our weighted graph model can also be construed as a multigraph process by looking at the multigraph induced by the Poisson counts of the Poisson random variable with mean given by the edge weights.  More formally, let $m = (m_e, e\in E)$ be a multigraph on a given vertex set $V$.  Here we let $m_e \geq 0$ denote the number of copies of edge $e \in E$ that links vertices in $V$.  Our model naturally associates an observed multigraph process denoted by $$(M(t), 0 \leq t < \infty) = (M_e(t), e\in E, 0 \leq t < \infty).$$
+
+Note that this is a continuous time Markov chain.  It's state space is the set $\mathbb{M}$ of all multigraphs over $V$ where the transition rates $$ m \rightarrow m \cup \{ e\}, \text{  are given by rate   } w_e.$$
+\bigskip
+where $\psi(x)$
+\bigskip
+
+\begin{definition}\textit{Standard Process}
+
+The Markov chain given by $(M(t), 0 \leq t < \infty) = (M_e(t), e\in E, 0 \leq t < \infty)$, where  $M(t)$ starts from the empty set $\emptyset.$
+\end{definition}
+
+\begin{definition}
+
+Multigraph Monotonicity Property
+
+Let $$ T = T_{\mathcal{A}} = \inf \{t : M(t) \in \mathcal{A}\}$$ be the stopping time where $\mathcal{A} \subset \mathcal{M}$ is the set of multigraphs such that $$ \text{ if } m \in \mathcal{A} \text{ then } m \cup \{e\} \in \mathcal{A}, \forall e.$$
+
+For the chain started at some state $m$, define $$ h(m): = \mathbb{E}_mT_{\mathcal{A}}.$$
+
+
+
+By the monotonicity property we have that the hitting time of a set in $\mathcal{A}$ is lower bounded by the hitting time of sets above it in the chain.  That is
+
+\begin{equation}
+h(m\cup \{e\}) \leq h(m).
+\end{equation}
+
+\end{definition}
+
+Naturally then, starting from $\emptyset$ will give $h(\emptyset)$ that upper bounds all such $h(m)$. 
+
+In this setting we can quote the following concentration bound from \cite{david_FFP}.
+
+\begin{prop}[\cite{david_FFP}]
+For the standard chain, for a stopping time $T$ defined above we have $$ \frac{var T}{\mathbb{E}T} \leq \max_{m, e}\{h(m) - h(m \cup \{e\}) : w_e > 0\}$$
+\end{prop}
+
+Two examples of such a stopping time where we can estimate the bound well with the appropriate monotonic proces: 
+
+$$ T^{tria}_k : = \inf\{t: M(t) \text{ contains k edge-disjoint triangles}\} $$
+
+$$ T^{span}_k := \inf\{t: M(t) \text{ contains k edge-disjoint spanning trees} \}$$
+
+\begin{prop}[\cite{david_FFP}]
+
+Let s.d. denote the standard devation. 
+
+$$ \frac{s.d.(T^{tria}_k)}{\mathbb{E}T^{tria}_k} \leq \bigg( \frac{e}{e-1}\bigg)k^{-1/6}, k \geq 1$$
+
+$$ \frac{s.d.(T^{span}_k)}{\mathbb{E}T^{span}_k} \leq k^{-1/2}, k \geq 1$$
+
+\end{prop}
+
+This is a setting in which the above bounds actually do not depend on $w$, so it is uniform over all weighted graphs.  
+
+This bound will be useful for obtaining an estimator of a functional when we have a stopping time $T$ that is concentrated around its mean that also does not depend on $w$.  In that case we will be able to use the proposition to provide a bound uniform over all $w$ of some functional $\Gamma(w)$ defined by the expectation of the stopping time.   
+
+The proof of the proposition requires special structural properties of spanning trees and triangles.  The technique for triangles also hold for analogs of similar subgraphs. The question of whether this argument can apply to "k copies of substructure" is open, however it does not apply as easily in all cases.  In section we show a case in which the argument does not apply easily.
+
+For proposition 2 to be useful, we need $ \max_{m, e}\{h(m) - h(m \cup \{e\}) : w_e > 0\}$ to be bounded.  If we instead require $\{h(m)-h(m\cup \{e\})$ be bounded for the most possible transitions, it is possible to obtain applications of the monotonicity argument to first-passage percolation\cite{david_FFP} and the appearance of a incipient giant component in in-homogenous bond percolation\cite{david_FFP}.  These problems lie outside the current framework.  
+
+In this multigraph Markov chain setting, our stopping times $T$ also satisfy the submultiplicative property
+
+\begin{equation}
+\mathbb{P}(T > t_1+t_2) \leq \mathbb{P}(T > t_1)\mathbb{P}(T>t_2),\quad t_1, t_2 >0.
+\end{equation}
+
+%We can easily see this by considering the set of events that require at least $t_1+t_2$ hitting time, and recognize it is a subset of those that require both $t_1$ and $t_1$
+
+Submultiplicative properties of random variables are know to give a right exponential tail bound:
+
+\begin{equation}
+sup\{\mathbb{P}(\frac{T}{\mathbb{E}T} > t : T \text{ submultiplicative } \} \text{ decreases exponentially as } t \rightarrow \infty
+\end{equation}
+
+We can also bound the left tail by iteratively applying the monotonicity property to get $\mathbb{P}(T < k t_1) \leq \mathbb{P}(T > t_1)^k$, which gives us 
+
+\begin{equation}
+\begin{split}
+\mathbb{E}T &\leq \frac{t_1}{\mathbb{P}(T \leq t_1)}\\
+\mathbb{P}(T \leq t_1) &\leq \frac{t_1}{\mathbb{E}T}\\
+\mathbb{P}(T \leq a \mathbb{E}T) &\leq a, 0 <a <1.
+\end{split}
+\end{equation}
+By setting $t_1 = a \mathbb{E}T$.
+
+In other words, if our stopping time $T$ enjoys the submultiplicative property (4.2), then after observing the value of $T$ in the observed process 
+\begin{equation}
+\text{ we can be } (1-a) \text{-confident that } \mathbb{E}T \leq T/a \text{ in the true process }. 
+\end{equation}
+
+Note that Markov's inequalty, which states that $\mathbb{P}(T \geq a) \leq \frac{\mathbb{E}T}{a}$ gives us a different confidence statement, namely that $$ \text{ we can be } (1-a) \text{-confident that } \mathbb{E}T \geq aT.$$
+
+\section{Measuring Connectivity via Multicommodity Flow}
+
+A key open problem in our framework is to prove a result of the following type.  Given our observation time is large, but of order $t = O(1)$, the observed $G^{obs}(t)$ will have a giant component of some size, say $(1-\delta)|V|$.  However, this graph may not be completely connected.  We want a statement that allows us to conclude that $G$ enjoys a "well-connected" connectivity property within a large subset of its vertices if we observe that $G^{obs}(t)$ has a "well-connected" property within its giant component.  
+
+Recall that the graph Laplacian is a well studied way to quantify connectedness in graphs.  In particular, the spectral gap gives bounds for many quantities that relates to the connectedness qualities of a graph.  We discuss the Laplacian in detail in part II of this thesis so don't provide definitions here.  
+
+Proving bounds on the spectral gap in our regime without assumptions on $w$ is quite difficult.  However to give a push towards results of this flavour, we provide a result not in terms of connectedness as quantified by spectral gap, but by measuring connectivity in terms of the existence of flows whose magnitude is bounded relative to edge-weights.  Note that our observed graph $G(t)$ may very well be disconnected in the time regimes of $t=O(t)$, so we cannot hope to get a flow between all vertex pairs in $G$.  Instead our definition must use information of flows between \textit{most} pairs. 
+
+\begin{definition}
+A \textit{path} between vertex $x$ to vertex $y$ is a set of directed edges that connects $x$ to $y$; a \textit{flow}, denoted by $\phi_{xy} = (\phi_{xy}(e), e \in E)$ is a vector indexed by edges of a path, where each $\phi$ is given by 
+
+$$\phi_{xy}(e) := \nu \mathbb{P}(e\in \gamma_{xy}) $$
+
+where $\gamma_{xy}$ is some random path from $x$ to $y$.  We let $|\phi_{xy}|$ denote the volume $\nu$ of a flow.  
+\end{definition}
+
+\begin{definition}
+
+
+A \textit{multicommodity flow} $\Phi$ is a collection of flows $  (\phi_{xy}, (x,y) \in V \times V)$ (including flows of volume zero).  We let $$ \Phi[e] := \sum_{(x,y)}\phi_{xy}(e)$$ denote the total flow across edge $e$.  
+
+\end{definition}
+Let's consider the following function on the network.  Suppose $\Phi$ is constrained by the following:
+
+\begin{equation}
+\text{The volume } |\phi_{xy}| \text{ is at most }n^{-2}, \text{ where }(x,y) \ in V\times V
+\end{equation}
+
+\begin{equation}
+\Phi[e] \leq \alpha w_e.
+\end{equation}
+
+The first condition allows us to somewhat normalize the total flow, whereas the second let's us control how much flow flows through edge $e$ via its weight.  
+
+\begin{definition}
+$$\Gamma_{\alpha}(w) := \max_{\Phi \text{satisfies two conditions above}}\sum_{(x,y)\in V\times V} |\phi_{xy}|.$$
+\end{definition}
+
+By our conditions, $\Gamma_{\alpha}(w) \leq 1$. The smallest $\alpha$ for which $\Gamma_{\alpha}(w) = 1$ also bounds the spectral gap. This is known as the canonical path or Poincar\'e method\cite{persi}.\\
+
+Let's define the $(\alpha, \delta)$-properly to hold if $\Gamma_{\alpha}(w) \geq 1 - \delta$.  If we have the property holds for small $\delta$, we are quantifying via lower bounding the flow that the network has a well-connected component. As $\alpha \downarrow$ and $\delta \downarrow$, our property becomes stronger and the degree with which it has a large well-connected component is also larger. 
+
+Returning back to the observed networks framework we aim to prove a statement of the form: If $G^{obs}(t)$ has $(\alpha, \delta)$-property, then we are 95\% confident that the unknown $G^{true}$ has $(\alpha^*, \delta^*)$-property for some $(\alpha^*, \delta^*)$ independent of $w$.  
+
+Let $$T_{\alpha, \delta} := \inf \{ t: \Gamma_{\alpha}(M(t)) \geq 1-\delta\}.$$
+where we interpret the multigraph $M(t)$'s edge count as integer edge-weights.  
+
+$M(T)$ by definition allows a total flow of volume greater than $1-\delta$, and by assumption satisfies the normalizing property (4.5) as well as the analogue of property (4.6) for the multigraph (using $ N_e(t)/t \sim w_e$). If we take expectations over realizations of $M(T)$ we get $\Gamma_{\alpha}(w) \geq 1-\delta$ and furthermore 
+
+$$ \Phi[e] \leq \alpha \mathbb{E}M_e(T) = \alpha w_e \mathbb{E}T, \text{ for all } e.$$
+
+Recall Wald's inequality, which applies to a sequence $(X_n)_{n \in \mathbb{N}} $ of independent identically distributed random variables. If $N$ is some non negative integer valued random variable we have 
+
+$$ \mathbb{E}(X_1+...+X_n) = N \mathbb{E}(X).$$
+
+Applying this to $M_e(t) = N_e(t)/t$ we get that 
+
+$$ \Phi[e] \leq \alpha \mathbb{E}M_e(T) = \alpha w_e \mathbb{E} T. $$
+
+So summarizing, we were able to derive from $G^{obs}$ satisfying (4.5) and the analogue of (4.6) that $$ G^{True} \text{ has the } (\alpha\mathbb{E} T, \delta) \text{ property}$$
+
+But we have just shown in the last section in (4.5) that we can be $(1-a)$ confident that $\mathbb{E}T \leq T/a$.  So it follows that 
+
+\begin{equation}
+\text{ we are } (1-a)-\text{confident that } G^{true} \text{ has the }(\alpha T/a, \delta)-\text{property}.
+\end{equation}
+
+\section{Logic of Inference between Observation and Truth}
+
+Though we are quite used to citing confidence intervals in statistical jargon, it is worth spending some time spelling out the underlying logic of the inference being made. Though it follows basic forms of inference, it's worth discussing here as it may seem intuitive to want proofs along the lines of wanting to establish desirable properties in the observed graph given desirable properties in the real graph.  However the correct direction of the inference is in fact the converse of that. Particularly in the context of our applications, this inference appears counter-intuitive.  To formalize:
+
+Suppose $P$ is some property of a network we care about.  The statements we wish to prove follow the inference format 
+\begin{center}
+If $G^{obs}$ has property $P$ then we are $\geq 95\%$ confident that $G^{true}$ has property $P^*$.
+\end{center}
+
+Where $P^*$ is reasonably related to $P$.  For instance, both measure connectedness.  To prove a statement of the above form, we actually need a theorem of the following form (using the contrapositive):
+
+\begin{center}
+\textit{Theorem}: if $G^{true}$ does not have property $P^*$ then with $\geq 95\%$ probability $G^{obs}$ does not have property $P$.  
+\end{center}
+
+The reason for using the contrapositive is because it would be very difficult to enumerate all instances of graphs with property $P$, so instead we assume the negation of the conclusion and deduce that the observed graph cannot have property $P$.  
+
+What this means for our program is that in order to establish desirable properties in our random graphs, we work in its negative form.  So for instance in the case of $P$ representing connectivity properties of the graph, we must show that given the true graph is not well connected, the observed graph cannot be either.  We are not showing that the observed graph is well connected given the true graph is (converse).  Happily, this is typically false in our time scale as well.  

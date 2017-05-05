@@ -1,0 +1,326 @@
+
+\chapter{Maximum Matchings}
+Suppose we have a weighted graph $G = (V, E)$ with an even number of vertices.  We can always assume $G$ is complete by assigning weight $0$ to edges not in $E$.  
+
+\begin{definition}
+A \textit{matching} is a set $\pi$ of $\frac{n}{2}$ edges such that each vertex is in exactly one edge. 
+\end{definition}
+
+\begin{definition}
+The weight of a matching is given by $$weight(\pi, w):= \sum_{e \in \pi} w_e .$$
+The \texit{maximum weight} is taken over all possible matchings: $$ \Gamma_1(w) := \max_{\pi} weight(\pi, w)$$ We care about maximal matchings because weights in our model indicate closeness (similar to how we maximized interactions in the previous section to define communities). 
+\end{definition}
+What can we say about estimating $\Gamma_1(w)$ by observing $G^{obs}(t)$ in our regime of interest of large but constant times $t = O(1)$? The naive estimator $\Gamma_1(G^{obs}(t))$ has several undesirable properties. Consider graphs $G^{true}$ with interaction rates of vertices $(w_v)$ of $O(1)$.  For locally compact graphs (where the intuition is that we do not have a growing number of small weighted edges per vertex) the matching $\Gamma_1(w)$ is of order $\theta(n)$.  In this case, the naive estimator may not perform so poorly, even though we construe $t$ as fixed, we still have growth in $n$, so the naive estimate improves as $n \rightarrow \infty$ \\
+
+Suppose instead we observe a diffuse graph, an example of such a $G^{true}$ is the complete graph with $w_e = \frac{1}{n}$ for all edges $e$.  Then necessarily $\Gamma_1(w) = \frac{n/2}{n} = \frac{1}{2}$.  However, $G^{obs}$ is essentially the Erd\"os-R\'enyi random graph $\mathcal{G}(n, t/n)$. From results in \cite{David-incipientgiant} we have that $\Gamma_1(G^{obs}(t)) \sim c(t)n$ for a certain function $c(t)$.\\
+
+So this is clearly incorrect.  Thus, if our $G^{true}$ contains a non-trivial component of a diffuse graph, we are in trouble when using the naive estimator, as it is off by a factor of $O(n)$.\\
+
+We can circumvent the problem by reweighing the quantity of interest.  Consider $\frac{\Gamma_1(w)}{n}$.  This ratio can be read as the weight-per-vertex of the maximum-weight matching.  We can effectively ignore edges of weight $o(1)$.  We also consider edges for which we have observed at least two interactions.  
+
+\begin{definition}\textit{Adjusted Vertex Weights}
+
+\begin{center}
+
+$weight_2 (\pi, G^{obs}(t)):= t^{-1}\sum_{e \in \pi}M_e(t)\mathbb{I}_{M_e(t) \geq 2}$\\
+\bigskip
+
+
+$\Gamma_2(G^{obs}(t)):= \max_{\pi} weight_2 (\pi, G^{obs}(t))$.
+
+\end{center}
+\end{definition}
+
+
+
+This new definition will be useful if we can show that 
+\begin{equation}
+n^{-1}|\Gamma_2(G^{obs}(t)) - \Gamma_1(w)| \text{ is small for large } t \text{, uniformly over all } w.
+\end{equation}
+
+Note that we cannot do better than $O(t^{-1/2})$;  consider a graph with one edge.  Then we have an exact hold over the variance of the Poisson counts for one edge, which is of order $t^{1/2}$.  
+
+
+
+\begin{prop}
+\text{ Assume } $G^{true}$ \text{ satisfies } 
+
+\begin{equation}
+w_e \leq 1 \forall e \in E
+\end{equation}
+
+\text{ then } 
+\begin{equation}
+\mathbb{E}\bigg[n^{-1}(\Gamma_2(G^{obs}(t))-\Gamma_1(w)\bigg]^- \leq t^{-1/2} + \frac{1+\log t}{2 t},  \forall w \forall t \geq 1.
+\end{equation} 
+
+\text{ Assuming the even stronger condition of } 
+
+\begin{equation}
+w_v \leq 1, \forall v \in V
+\end{equation}
+
+\text{ we have } 
+
+\begin{equation}
+\bigg[n^{-1}(\Gamma_2(G^{obs}(t))-\Gamma_i(w)\bigg]^{+} \leq \Psi(t),  \quad \forall w
+\end{equation}
+
+\text{ where } 
+
+\begin{equation}
+\Psi(t) = O(t^{-1/2}\log t) \text{ as } t \rightarrow \infty
+\end{equation} and $[\cdot]^+, [\cdot ]^-$ refer to the negative and positive portions respectively. 
+\end{prop}
+
+The proof works to bound $\Gamma_2(G^{obs}(t))$;  the contribution from small, i.e $o(1)$, weight edges can be controlled given our assumptions.  We prove a lemma that deals with it.  The contribution from $\Theta(1)$-weight edges can be controlled with large deviations type arguments because the assumptions limit the number of matchings with such weights to be exponential.  
+
+\section{Bounding the Negative Contribution}
+
+Here we derive the bound from the negative contribution in Proposition 1
+$$
+\mathbb{E}\bigg[n^{-1}(\Gamma_2(G^{obs}(t))-\Gamma_1(w)\bigg]^- \leq t^{-1/2} + \frac{1+\log t}{2 t},  \forall w \forall t \geq 1
+$$
+
+by finding a lower bound for $\Gamma_2(G^{obs}(t))$.
+
+\bigskip
+
+If we fix matching $\pi$, the sum of edge weights in the observed graph belonging to the matching is distributed as a Poisson random variable, since we are summing together independent Poissons.
+
+$$ \sum_{e \in \pi} M_e(t) \sim \text{Poisson}(t\cdot weight(\pi, w)).$$ 
+
+If we fix $\pi$ to be the matching attaining the maximum in 
+
+$$\Gamma_1(w):= \max_{\pi} weight(\pi, w) $$
+
+we get that 
+
+$$ \Gamma_2(G^{obs}(t)) \geq weight_2(\pi, G^{obs}(t)).$$
+
+This follows from the fact that $\pi$ is not necessarily the matching that attains the maximum for $\Gamma_2$, despite being the matching that attains the maximum for $\Gamma_1$.  
+
+Thus to lower bound $ \Gamma_2(G^{obs}(t))$, it suffices to lower bound $weight_2(\pi, G^{obs}(t))$.  
+
+Since $weight_2$ does not include contributions from edges that have less than 2 counts from $Poisson(w_e)$ we can rewrite the following difference as $$ \sum_{e \in \pi}M_e(t) - t\cdot weight_2(\pi, G^{obs}(t)) = \sum_{e \in \pi} M_e(t)1_{M_e(t)=1}.$$
+
+Apply expectation on both sides gives us
+
+$$ \mathbb{E}\bigg(\frac{\sum_{e \in \pi}M_e(t) - t\cdot weight_2(\pi, G^{obs}(t))}{t}\bigg)= \sum_{e \in \pi} w_e \exp(-tw_e).$$
+
+Note that since $\pi$ attains the maximum for $\Gamma_1$, we actually have  
+$$ \sum_{e \in \pi} M_e(t) \sim t \cdot \Gamma_1(w)$$.  
+
+Our goal is to upper bound the right side using $0 \leq w_e \leq 1$ and $\sum_{e\in \pi}w_e = \Gamma_1(w) \leq n/2$.  To control different portions of the contribution from $w_e$ large and small, let's bound separately $w_e \leq b$ and $w_e > b$ for some b, which we choose a value for $b$  based on the final expression.  Immediately we have 
+
+$$\sum_{e\in \pi}w_e\exp(-tw_e) \leq \frac{n}{2}b + \Gamma_1(w)\exp(-t b).$$
+
+So to get the tightest bound we minimize the right side over $b > 0$.  This gives us
+
+$$n^{-1}\sum_{e \in \pi}w_e \exp(-tw_e) \leq \frac{1}{2t}\psi(\frac{2t\Gamma_1(w)}{n})$$
+
+where 
+\begin{equation}
+\begin{split}
+\psi(x) &= 1+\log(x), x \geq 1\\
+&= x,\quad  0 < x \leq 1.
+\end{split}
+\end{equation}
+
+
+So to simplify the expression, if we defined $$D_2:= n^{-1}\bigg(t^{-1}\sum{e \in \pi} M_e(t) - \text{weight}_2(\pi, G^{obs}(t))\bigg) \geq 0$$
+
+then we have shown that $$\mathbb{E}D_2 \leq \psi(\frac{2t\Gamma_1(w)}{n}).$$
+
+Recall that $\sum_{e \in \pi}M_e(t)$  has $Poisson(t\cdot\Gamma_1(w))$ distribution, and since we were intersted in showing the difference in expectation of 
+$$ D_1 := n^{-1}\bigg(t^{-1}\sum_{e \in \pi}M_e(t) - \Gamma_1(w)\bigg)$$ 
+
+in the negative direction, so let us control 
+$$ \mathbb{ P}(D_1 < \delta)  = \mathbb{P}\bigg(t^{-1}\sum_{e \in \pi}M_e(t) < t\Gamma_1(w) - nt\delta\bigg)$$.  
+
+We can set $\lambda = t \Gamma_1(w)$ and $a = 1-n\delta/\Gamma_1(w)$ and use the first large deviations bound in (2.2), giving us
+
+$$\mathbb{P}(D_1 < -\delta) \leq \exp(-t\Gamma_1(w)\phi(1-n\delta)).$$
+
+And since $\phi(1-\eta) \leq \eta^/2$, we can further simplify to 
+
+$$ \mathbb{P}(D_1 < -\delta) \leq \exp(\frac{tn^2\delta^2}{2\Gamma_1(w)}).$$
+
+But by assumption $\frac{\Gamma_1(w)}{n}\leq 1/2$ and $n \geq 2$ so we get 
+
+$$\mathbb{P}(D_1 < -\delta) \leq \exp(-2t\delta^2). $$
+
+Integrating over $\delta$ gives us 
+$$\mathbb{E}\min(0, -D_1) \leq 2^{-3/2}\pi^{1/2}t^{-1/2}. $$
+
+So using the estimates from $D_1$ and $D_2$ we are able to lower bound $D$:
+
+\begin{equation}
+\begin{split}
+D &:= n^{-1}\big( \Gamma_2(G^{obs}(t))-\Gamma_1(w))\big)\\
+&\geq n^{-1}\big(\text{weight}_2(\pi, G^{obs}(t))-\Gamma_1(w))\big) = D_1-D_2.
+\end{split}
+\end{equation}
+
+So 
+
+\begin{equation}
+\begin{split}
+\mathbb{E}\max(0, -D) &\leq \mathbb{E}\max(0, D_2-D_1)\\
+&\leq \mathbb{E}D_2+\mathbb{E}\max)0, D_1)\\
+&\leq 2^{-3/2}\pi^{1/2}t^{-1/2} +\frac{1}{2t}\psi(t)
+\end{split}
+\end{equation}
+
+using also that $\Gamma_1(w) \leq n/2$.  This implies the first lower bound cited in Proposition 1.  
+
+\section{The Upper Bound}
+
+If we fix a matching $\pi$, the sum of our edge counts in $\pi$ given by $\sum_{e \in \pi}M_e(t)$ has Poisson$(t \cdot \text{weight}(\pi, w))$ distribution.  since $\text{weight}(\pi, w)) \leq \Gamma_1(w)$ we can use the second large deviations bound given at the beginning of the chapter, with $\lambda = t \cdot \Gamma_1(w)$ to get
+
+$$ \frac{1}{t \cdot \Gamma_1(w)}\log \mathbb{P}\bigg( \sum_{e \in \pi} M_e(t) \geq nt(\frac{\Gamma_1(w)}{n}+a)\bigg) \leq -\phi(1+\frac{an}{\Gamma_1(w)}), a >0.$$
+
+Multiplying $1/n$ by both sides and rearranging some terms within and outside of $\mathbb{P}$ we get 
+
+\begin{equation}
+n^{-1}\log \mathbb{P}\bigg( n^{-1} \sum_{e \in \pi} M_e(t)/t \geq \frac{\Gamma_1(w)}{n}+a\bigg) \leq -tn^{-1}\Gamma_1(w)\phi(1+\frac{an}{\Gamma_1(w)}), a >0.
+\end{equation} 
+
+Which will be easier for us to parse in terms of the following matchings.  For $k\geq 2$ let $\Pi_k$ be the set of partial matchines $pi$ that only use edges with weight greater than $1/k$, and suppose that the matchings are maximal with respect to this constraint (i.e they are the largest matchings given all $w_e > 1/k$).  Since we have paths of length $n$ and we have at most $k$ such $w_e$ to choose from, if we had more we would violate the assumption that total weight is less than $1$. From this we can at infer $|\Pi_k| \leq k^n$.  Note that if we take any matching $\pi$ (doesn't have to be from $\Pi_k$), the subset of edges with $w_e > 1/k$ still form part of a partial matching in $\Pi_k$, so it follows from $|\Pi_k| \leq k^n$ and (3.10) that 
+
+\begin{multline}
+n^{-1}\log \mathbb{P}\bigg( \exists \pi \in \Pi_k: n^{-1} \sum_{e \in \pi, w_e > 1/k}M_e(t)/t \geq \frac{\Gamma_1(w)}{n}+a\bigg)\\ \leq -tn^{-1}\Gamma_1(w)\phi(1+\frac{an}{\Gamma_1(w))+\log k}).
+\end{multline}
+
+To control the contribution from the low weight (less than $1/k$) edges let us define
+
+$$ \Delta_k(\pi):= \sum_{e \in \pi, w_e \leq 1/k}M_e(t)1_{M_e(t) \geq 2}.$$
+
+But by definition a matching uses only one edge per vertex so we can bound this using $M^*_v := \max\{M_{vy}(t):w_{vy} \leq 1/k\}$ to get
+
+\begin{equation}
+\max_{\pi}\Delta_k(t) \leq \frac{1}{2}\sum_vM_v^*1_{M_v^* \geq 2} 
+\end{equation}
+
+\begin{lemma}
+Let $(N_i, i\geq 1)$ be independent Poisson($\lambda_i)$, and write $N^* := \max_i N_i$. Suppose $s:=\sum_i\lambda_i \geq 1$ and choose $lambda^* \geq 1$ such that $\max_i\lambda_i \leq \lambda^* \leq s$.  Then we have
+
+$$\mathbb{E}N^*1_{N^*\geq 2} \leq C \lambda^* (1+\log(s/\lambda^*)) $$ for some constant $C$.  
+\end{lemma}
+
+\begin{proof}
+Given at end of section.
+\end{proof}
+
+To apply Lemma 3.2.1 we note that  $M_{vy}(t)$ has Poisson$(tw_{vy})$ distribution and \\
+$\sum_{u:w_{vy} \leq 1/k} w_{vy} \leq 1$ by our assumption that 
+$w_v \leq 1, \forall v$.  So regarding $s=t$ and $\lambda^* = t/k$ gives us the lemma result that 
+
+$$ \mathbb{E}M^*_v1_{M_v^* \geq 2}\leq Ctk^{-1}(1+\log k),\qquad k \leq t$$
+
+Applying (3.12) gives us 
+
+\begin{equation}
+\frac{1}{n}\mathbb{E}[\max_{\pi}\Delta_k(\pi)] \leq \frac{1}{2}Ctk^{-1}(1+\log k),\quad k \leq t
+\end{equation}
+
+We are trying to upper bound 
+
+$$ D:= n^{-1}\big( \Gamma_2(G^{obs}(t)) - \Gamma_1(w)\big)$$
+
+so let us call the event in the probability in (3.10) $B$.  By definition, $B^c$ is the event that 
+
+$$  n^{-1}\Gamma_2(G^{obs}(t)) \leq n^{-1}\Gamma_1(w) + a +n^{-1}t^{-1}\max_{\pi}\Delta_k(\pi).$$
+
+So this gives us
+
+$$ D \leq a + n^{-1}t^{-1}\max_{\pi}\Delta_k(\pi).$$
+
+Let $F$ be the event that $\{n^{-1}t^{-1} \max_{\pi}\Delta_k(\pi) > a\}$ then the above simplifies to 
+
+$$ D < 2a, \text{ on } B^c \cap F^c$$
+
+and from Markov's inequality and 3.13 we have $$\mathbb{P}(F) \leq Ck^{-1}(1+\log k)/a, k \leq t.$$
+
+Summing up, 3.10 gave a bound on $\mathbb{P}(B)$, we just gave a bound on $\mathbb{P}(F)$, and also dervied a bound on $B^c \cap F^c$.  So putting these together we get 
+
+\begin{equation}
+P(D > 2a) \leq \exp(n(-tn^{-1}\Gamma_1(w)\phi(1+\frac{an}{\Gamma_1(w)}) + \log k))+Ck^{-1}(1+\log k)/a, \quad k \leq t.
+\end{equation}
+
+Our goal now is to optimize over the choice of $k$.  
+
+Let us continue the calculations using leading terms to clarify the exposition.  In particular we use the asymptotic relation $\phi(1+\delta) \sim \delta^2/2, \delta \downarrow 0$.  This allows us to simplify the term, along with using $\Gamma_1(w) \leq 1/2$
+
+$$\Gamma_1(w)\phi(1+\frac{an}{\Gamma_1(w)})= \frac{a^2n}{2}\frac{n}{\Gamma_1(w)}  \geq a^2n .$$
+
+This allows us to rewrite 3.14 as 
+
+\begin{equation}
+\mathbb{P}(D > 2a) \leq k^n \exp(-nta^2) + Ck^{-1}(1+\log k)/a, k \leq t.
+\end{equation}
+
+Most notably, this bound does not depend on $w$!  Integrating over $a$ allows us to get an expression in terms of $\mathbb{E}(D)$. 
+
+\begin{equation}
+\int_{a_0}^1 \mathbb{P}(D > 2a)da \leq k^n \frac{1}{2nta_0} \exp(-nta^2) + Ck^{-1}(1+\log k)\log{1/a_0}
+\end{equation}
+
+Recall that $k$ was our parameter to separate the big $w_e$ and small $w_e$, where we isolated the contribution from $w_e \leq 1/k$.  If we now set $k = t$ and $a_0 = t^{-1/2}\log t$ for large $t$ our bound becomes
+
+
+\begin{equation}
+\int_{a_0}^1 \mathbb{P}(D > 2a) da \leq \frac{\exp(-n(\log^2t - \log{t}))}{2n^{1/2}\log t} + \frac{C \log^2 t}{t}
+\end{equation}
+
+The right hand side is in fact uniformly bounded in $n$ by a function that decays as $o(t^{1/2})$ as $t \rightarrow \infty$.  
+
+So 
+
+$$ \int_{a_0}^1 \mathbb{P}(D > 2a)da = o(t^{-1/2}) \text{ as } t\rightarrow \infty, \text{ uniformly in } n $$
+
+So finally we have 
+
+$$ \mathbb{E}D^+ = 2\int_{a_0}^1 \mathbb{P}(D > 2a)da +\int_{2}^{\infty} \mathbb{P}(D > a)da $$
+
+The last term we are able to control because $D \leq n^{-1}\Gamma_2(G^{obs}(t))$ and clearly $\Gamma_2(G^{obs}(t)) \leq t^{-1}\sum_eM_e(t)$ since any matching is bound by the total sum.  
+
+But $\sum_eM_e(t)$ has Poisson($t\sum_eM_e(t)$) distribution so by the assumption that $w_v \leq 1 \forall v$ we have that 
+
+\begin{center}
+D is stochastically smaller than $\frac{1}{nt}$Poisson($nt/2$)
+\end{center}
+
+So using the large diviation upper bound stated at the beginning of this chaper we can conclude that $\int_{2}^{\infty} \mathbb{P}(D > a)da \rightarrow 0$
+exponentially fast in $nt$.  Thus the asmptotic behaviour of $\mathbb{E}D^+$ is dominated by the first term, which means it is $O(t^{-1/2}\log{t})$ as $t \rightarrow \infty$, uniformly in $n$.  
+
+\begin{proof}\textit{Lemma 2.}
+
+
+Recall that Lemma 2 states that given $(N_i, i\geq 1)$ are independent Poisson($\lambda_i)$. Suppose that $N^* := \max_i N_i$. Suppose $s:=\sum_i\lambda_i \geq 1$, and suppose we choose $\lambda^* \geq 1$ such that $\max_i\lambda_i \leq \lambda^* \leq s$.  Then we have
+\begin{center}
+$$\mathbb{E}N^*\mathbb{1}_{N^*\geq 2} \leq C \lambda^* (1+\log(s/\lambda^*)) $$ for some constant $C$.  
+\end{center}
+
+Let's regard $N_i$ as the counts of a rate-1 Poisson point process on the interval $[0,s]$ in successive intervals of lengths $\lambda_i$.  Let $k = \ceil*{s/\lambda^*}$  be successive intervals of length $\lambda^*$.  By definition of $\lambda^*$, each intervals in the first collection must be contained in the union of two successive intervals in the second collection.  This observation allows us to simplify our proof, since it would be sufficient to prove that there exists a constant $C$ such that if $(N_i, 1 \leq i \leq k)$ are i.i.d Poisson($\lambda^*$) with $\lambda^* \geq 1$ and 
+
+$$ \mathbb{E}N^*1_{N^* \geq 2} \leq C \lambda^* (1+\log{k})$$
+
+Clearly, if $\lambda^* \geq 1$ there is some constant $B$ such that for $i \geq B \lambda^*$
+
+$$ \frac{\mathbb{P}(Poisson(\lambda^* \geq i+1))}{\mathbb{P}(Poisson(\lambda^* \geq i))}.$$
+
+Using this for the last step in the inequality below we have 
+
+\begin{equation}
+\begin{split}
+\mathbb{E}N^* &= \sum_{i \geq 1}\mathbb{P}(N^* \geq i)\\
+ &\leq \sum_{i \geq 1} \min (1, k\mathbb{P}(Poisson(\lambda^*) \geq i))\\
+&\leq 1 + \max(B\lambda^*, \min \{ i: \mathbb{P}(Poisson(\lambda^*) \geq i) \leq 1/k\}).
+\end{split}
+\end{equation}
+
+Finally by the large deviations uppers bound we have that there exists $C^* < \infty$ such that 
+
+$$  \mathbb{P}(Poisson(\lambda^*) \geq i) \leq 1/k, \lambda^* \geq 1, i \geq C^* \lambda^* (1+ \log k).$$
+\end{proof}

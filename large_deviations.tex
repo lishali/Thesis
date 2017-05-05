@@ -1,0 +1,96 @@
+\chapter{Estimators given by Large Deviation Bounds}
+
+%Look at how actual functions you may care about can be different when predicted.  Get at some empirical data that shares this behaviour with your model. 
+
+A lot of functionals of interest concern the maximum of the sum of edge weights.  In particular, they can be expressed in the form 
+\begin{equation}
+\Gamma(G) := \max_{A \in \mathcal{A}}\sum_{e\in A}w_e
+\end{equation} 
+where $\mathcal{A}$ can be any collection of edge sets.  For instance, if you wanted to find a subset of vertices of size $k$ that are highly connected (oftentimes the kind of property desired in a theoreticaly defined graph community), we can ask for $|\mathcal{A}| = k$. 
+
+The naive estimator of the functional above, in the form $\Gamma(G^{obs}(t))$ given in the previous section, is particularly amenable to a large deviation bounds type argument because we are studying the maximum of a sum of independent Poisson random variables. Recall the large deviation bounds for $Poisson(\lambda)$ random variable are given by 
+\begin{equation}
+\begin{split}
+\frac{\log \mathbb{P}(Poi(\lambda) \leq a\lambda)}{\lambda} &\leq -\phi(a), 0<a<1\\
+\frac{\log \mathbb{P}(Poi(\lambda) \geq a\lambda)}{\lambda} &\leq -\phi(a), 1<a<\infty.
+\end{split}
+\end{equation}
+
+Where $\phi(a)= a -1 -a\log a, \quad 0 < a < \infty$.
+ 
+ \subsection{Weights of Communities}
+ 
+ Community detection falls under the general umbrella of clustering problems.  The term community is motivated by social network applications, where nodes are people and communities capture the idea of a group of more interconnected people, for example, a group of people that share much more interactions than with people outside the group.  Naturally once this goal is specified, to find a community within a network is to optimize for interconnectedness.  A more in depth treatment of the clustering and community detection literature is given in Part II of this thesis.  
+ 
+ A simple formulation in our graph terminology is to maximize the sum of the edge weights within a subset of fixed size:
+ 
+\begin{equation}
+w_m = \max\{\sum_{e \in A} w_e : |A^*|=m\}.
+\end{equation} 
+ 
+ Where $A^* \subset V$ and $A \subset E$ where A includes all edges where end-vertices are in $A^*$.  The maximum is taken over all vertex groups of cardinality $m$.  
+
+We don't pay attention to computational cost and compute the naive frequentist estimator of $w_n$ via observing $G(t)$:
+
+\begin{equation}
+W_n(t) := \max\{ \sum_{e \in A} \frac{N_e(t)}{t} : |A^*| = m\}.
+\end{equation} 
+
+Since we are taking a max of a sum of independent variables, this sum will oftentimes be larger than the sum of their means, that is $W_e(t)$ tends to be larger than $w_m$.  In the case where the interaction rate at vertex $v$ denoted $w_v$ is O(1) and we fix $m$, $W_n(t) \rightarrow \infty $ as $n \rightarrow \infty$.  In this case, it's natural to normalize the total interaction in a community of size $m$ by the number of edges in the complete subgraph of size $m$.  In other words, we define community as $\frac{\sum_{e \in A} w_e}{m^2}$.  Communities of size $m$ thus exist if they are not $\frac{\sum_{e \in A} w_e}{m^2} \neq o(1)$ (so at least the pairwise interactions is at least constant order).  
+
+
+ Note that $$Var (\frac{W_n(t)}{m^2}) = Var (\sum_{e \in \max A} \frac{N_e(t)}{t}) = \frac{w_m}{m^2\cdot t}$$ so the first order estimation error decreases as $\frac{1}{t^{1/2}}$ uniformly over $n$ and over weighted graphs (no dependence on $w_e$'s).
+
+To get a hold of how our frequentist estimate behaves in the limit, suppose the size $m$ of communities we care about is order $\log(n)$:
+
+By the union bound and using the fact that there are ${n \choose m}$ subsets of size $m$ in $G_n$, we arrive at:
+\begin{equation}
+\mathbb{P}(W_m(t) \geq \beta m) \leq {n \choose k} \mathbb{P}(Poi(w_m t) \geq \beta m^2 t).
+\end{equation}
+
+
+Given $w_m < \beta m^2$ we are in the position to apply large deviations bound  on $W_n(t)$ (since $\mathbb{E}(W_n(t)) = w_n$, we have
+
+\begin{equation}
+\begin{split}
+\log \mathbb{P}(W_m(t) \geq \beta m) & \leq \log {n \choose m} -w_mt\phi(\frac{\beta m^2}{w_m}) \\
+& \leq m \log n - w_m t \phi(\frac{\beta m^2}{w_m}) - \log m!.
+\end{split}
+\end{equation}
+
+Our original assumption was that $m = \gamma \log n$, and set $w_m = \alpha m^2$ for some $\alpha < \beta$ (so we can still apply large deviation bounds), then
+
+\begin{equation}
+\log \mathbb{P}(W_n(t) \geq \beta m^2) \leq (\gamma - \gamma^2 \alpha t \phi(\beta/\alpha))\log^2n-\log m!.
+\end{equation}
+
+So if $\beta = \beta(\alpha, \gamma, t)$ is the solution of 
+\begin{equation}
+\gamma \alpha t \phi(\beta/\alpha) = 1
+\end{equation}
+
+then we can simplify the expression and tease out the asympotitics of the tail behaviour of $W_m(t)$ with
+
+\begin{equation}
+\mathbb{P}(W_m(t) \geq \beta m^2) \leq \frac{1}{m!}.
+\end{equation}
+
+This tells us that in the case of $m = \gamma \log n$ and outside of the event $\{ W_m(t) \geq \beta m^2\}$, which tends to $0$ as $n \rightarrow \infty$ as show in (2.9), we can bound the estimation error
+
+\begin{equation}
+\frac{W_m(t)-w_m}{m^2} \leq \beta - \alpha.
+\end{equation}
+
+Where $\alpha = w_m/m^2$ and $\beta$ given as the solution of equation (2.8).
+
+The bound above is actually very general as it holds over all networks without assumptions on the distribution of weights $w_e$.  Another way to read this asymptotic bound is to consider how $\phi(a)$ behaves as $a \downarrow 1$. By taking the first two terms of its Taylor series expansion, $\phi(a) \sim \frac{(a-1)^2}{2}$ we get that
+
+\begin{equation}
+\beta - \alpha \sim \sqrt{\frac{2\alpha}{\gamma t}} \text{    as } t \rightarrow \infty
+\end{equation}
+
+We follow the frequentist setup of generating confidence intervals by assuming the existence of a true rate, and having hold of the distribution of observations. Thus, after observing the value of $\frac{W_n(t)}{m^2}$ we can be confident, based on the vanishing tail bound derived above, that $\frac{w_n}{m^2}$, our true community interaction rate, lies in the interval 
+
+\begin{equation}
+\Bigg[\frac{W_m(t)}{m^2}-\sqrt{\frac{2W_m(t)}{m^2\gamma t}}, \frac{W_m(t)}{m^2}+\sqrt{\frac{2W_m(t)}{m^2\gamma t}}\Bigg].
+\end{equation}

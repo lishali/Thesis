@@ -1,6 +1,6 @@
 \documentclass{ucbthesis}
-%\usepackage{biblatex}
-\usepackage[backend=bibtex]{biblatex}
+\usepackage{biblatex}
+%\usepackage[backend=bibtex]{biblatex}
 %\usepackage[style=numeric]{biblatex}
 %\addbibresource{mybib.bib}
 \DeclareNameAlias{default}{last-first}
@@ -110,7 +110,7 @@ The mathematical treatment of graphs has been approached from many directions, f
 On the other hand, applied fields have borrowed the tools and theorems proven in mathematics to inspire algorithms. A exciting young field with many such applications is the field of deep neural networks.  Deep neural networks have been extremely successful in many supervised domains, among them object detection in computer vision and machine translation are examples of applications with near human level performance or super human level performance.  This has been a demonstrated success of optimization via gradient descent like methods to gather statistical features of the large training sets.  Training sets that have become readily available to us in the last couple of years, along with the much more powerful level of computing power compared to when neural networks were first introduced more than 40 years ago.  
 
 
-This thesis is in two parts.  In the first part, we create a framework for studying the quality of inferences from a partially observed graph.  Given no assumptions on the underlying``true'' graph, we are interested in rigorously understanding how to quantify a functional on the observed graph that best approximates the functional of interest on the true graph. In part two, we make inferences on graphs from an empirical point of view.  Focusing on the problem of clustering, we design a deep neural network that has within its expressive closure the ability to approximate a rich family of algorithms, and a much more expressive reach beyond that.  We test the architecture and its performance on the stochastic blockmodel as well as real data sets with community labels.  We show that our graph neural network performs competitively in these settings with no parameter assumptions as well as with less computational steps. This work is only scratching the surface of the ability of these architectures and exciting extensions are discussed.
+This thesis is in two parts.  In the first part, we create a framework for studying the quality of inferences from a partially observed graph.  Given no assumptions on the underlying``true'' graph, we are interested in rigorously understanding how to quantify a functional on the observed graph that best approximates the functional of interest on the true graph. This is all based on joint work with David Aldous.  In part two, we make inferences on graphs from an empirical point of view.  Focusing on the problem of clustering, we design a deep neural network that has within its expressive closure the ability to approximate a rich family of algorithms, and a much more expressive reach beyond that.  We test the architecture and its performance on the stochastic blockmodel as well as real data sets with community labels.  We show that our graph neural network performs competitively in these settings with no parameter assumptions as well as with less computational steps. This work is only scratching the surface of the ability of these architectures and exciting extensions are discussed.  This second part is all based on work with Joan Bruna. 
 
 %We give a probability model to the observed graph to rigorously study the framework. 
 \part{A Probabilistic Model for Imperfectly Observed Graphs}

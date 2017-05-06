@@ -8,18 +8,17 @@ What are the algorithmic guarantees?
 \end{center}
 Approached from a theoretical point of view, progress on these questions comes from studying special cases, oftentimes derived from generative probability models that capture much of the empirical behaviour.  One extremely well studied model is the Stochastic Blockmodel (SBM).  One quick Google scholar search reveals about 8000 papers written on this topic, around 3000 of which since 2014.  It's a particularly simple and natural extension of the Erd\H{o}s Renyi random graph model, which exhibits community structure.  The randomness involved in the construction of the graph allows one to prove properties of the graph that hold asymptotically.  Despite the simplicity of its definition (requiring few parameters), the SBM has proved fertile grounds for testing algorithmic performance.  Theoretical questions to do with community detectability thresholds for the model given certain parameters have only been addressed in the easiest of regimes (2 communities)  in the last couple of years, using techniques ranging from branching processes in probability theory to phase transitions in Ising-like models in statistical physics.  
 
-\begin{definition}\textit{Stochastic Block Model (SBM)}
-can be defined by the following three parameters
+\begin{definition}The \textit{Stochastic Block Model (SBM)} is a random graph model that can be defined by the following three parameters.
 \begin{align*}
-    n & : \text{ number of vertices. }\\
-    c & =(c_1, ...c_k) \text{ is a partition of } \{1,2, ...,n\} \text{ into } k \text{ sets. }\\
-    W & \in \mathbb{R}^{k \times k}_{\geq 0}, \text{ symmetric matrix of probabilities of connections between the } k \text{ communitites.}
+    n & : \text{ The number of vertices in the graph. }\\
+    c & =(c_1, ...c_k): \text{ A partition of the vertex set,} \{1,2, ...,n\} \text{, into } k \text{ disjoint subsets. }\\
+    W & \in \mathbb{R}^{k \times k}_{\geq 0}: \text{A symmetric matrix of probabilities of connections between the } k \text{ communitites.}
 \end{align*}
 
-In the easiest case with two communities, we can define the SBM with 3 scalar paramters $n$, $p, q$, where $n$ is the number of vertices, $p$ is the probability of connecting within a community and $q$ is the probability of connecting between two nodes of different communities. 
-
+Given the above parameters, one can sample a SBM$(n, c, W)$ graph, call it $G = (V, E)$ (where $V$ is the vertex set and $E$ is the edge set, and $n= |V|$) by connecting two vertices $u, v \in V$ with probability $W_{ij}$, where $W_{ij}$ is the $ij^{th}$ entry of $W$, $v \in c_i$ and $u \in c_j$.  Whether one edge is in the SBM or not is independent of other edges and is solely determined by $W$ and $c$.  
 \end{definition}
 
+In the easiest case with two communities of the same size, we can define the SBM with 3 scalar paramters $n$, $p, q$, where $n$ is the number of vertices, $p$ is the probability of connecting two vertices if they are from the same community and $q$ is the probability of connecting between two nodes of different communities. 
 
 
 Since the SBM is a random graph, a given set of parameters will give rise to a distribution of graphs.  For instance, the following three graphs come from the same parameters: $n = 8$, $c = (\{0,1,2,3\}, \{4,5,6,7\})$, and $W =([1,0.15],[0.15,1])$. Otherwise put, in the simpler $3$-scalar parametrization, we have that Figure \ref{fig:awesome_image1}, \ref{fig:awesome_image2} and \ref{fig:awesome_image3} are all instantiations of SBM with parameters $p=1.0$, $q=0.15$ and $n=8$.  
@@ -49,7 +48,7 @@ So why is the clustering on the SBM hard?  Clusterings for the instantiations ab
  \end{center}
 \end{figure}
 
-\ref{fig:SBM_matrix_colour} is a coloured adjacency matrix representation of an SBM graph. Here we colour we represent the adjacency matrix by colouring a square in \ref{fig:SBM_matrix_colou} if there is an edge, and leave it white if there is no edge.  The red and yellow colouring differentiates the different community membership relationships (red for edges that are between two nodes of the same community, and yellow for edges between nodes that differ in their community membership). The number of nodes $n$ is much bigger in \ref{fig:SBM_matrix_colour} than in \ref{fig:awesome_image1}. Clearly $p$ and $q$ also don't seem too far apart, since the density of red and yellow nodes, though the difference is still perceptible, is not a great difference.  In a real clustering problem we don't know the actual colouring, as in the case in \ref{fig:SMB_uncolored}.
+The figure \ref{fig:SBM_matrix_colour} is a coloured adjacency matrix representation of an SBM graph. Here we represent the adjacency matrix by colouring a square in \ref{fig:SBM_matrix_colour} if there is an edge, and leaving it white if there is no edge.  The red and yellow colouring differentiates the different community membership relationships (red for edges that are between two nodes of the same community, and yellow for edges between nodes that differ in their community membership). The number of nodes $n$ is much bigger in \ref{fig:SBM_matrix_colour} than in \ref{fig:awesome_image1}. Clearly $p$ and $q$ also don't seem too far apart, since the density of red and yellow nodes, though the difference is still perceptible, is not a great difference.  In a real clustering problem we don't know the actual colouring, as in the case in \ref{fig:SMB_uncolored}.
 
 \begin{figure}[h]
 \begin{center}
@@ -74,16 +73,18 @@ In \ref{fig:SMB_unordered} we don't have any hope of eyeballing all possible par
 \section{Regimes of Clustering: Sparse to Dense}
 
 One of the things \ref{fig:SBM_matrix_colour}, \ref{fig:SMB_uncolored}, and \ref{fig:SMB_unordered} help highlight is how much more difficult clustering can be if the difference between $p$ and $q$, the in-community probability of connecting and out-community probability of connecting (respectively), is small.  In fact, there is a rigorous quantification of this heuristic, as it drives a dichotomy in the quality of community recovery we can achieve. 
+To talk about asymptotic behaviour of the SBM, let's confine our discussion to the the balanced SBM with two communities.  The definitions are easily extendable to SBM in general, however focusing on this balanced two community SBM makes clear what is being held constant and what is growing when we talk about asymptotic behaviour. 
+
 
 \begin{definition}
-\textit{Exact Recovery}: $\mathbb{P}(\text{estimated cluster} = \text{true}) \rightarrow 1$ 
+We say a clustering of SBM(n, p, q) gives an \textit{Exact Recovery} if the probability of estimating the correct cluster assignments on SBM(n,p,q) goes to one as the number of nodes $n$ grows.  A clustering of the nodes $\{1, 2, ..., n\}$ is a partition of the nodes into communities.  We can encode that as a binary valued function $F : V \rightarrow \{0,1\}$ in the case of the two community SBM(n, p, q). So the exact recovery regime can be stated as $$\mathbb{P}( F_n = \bar{F_n}) \rightarrow_n 1.$$  Where $F_n$ corresponds to the correct clustering for SBM(n, p, q) and $\bar{F_n}$ is the predicted cluster assignments.   
 \end{definition}
 
 \begin{definition}
-\textit{Detection}: $\exists \epsilon > 0 : \mathbb{P}(\text{agree on at least} 1/k+\epsilon) \rightarrow 1$ , $k$ is the number of communities. i.e Better than random.
+We say the clustering of SBM(n,p,q) gives \textit{detection} of the true communities if the predicted clusters correlate with the true communities.  Using the same $F_n$ (true community assignments) and $\bar{F_n}$ (predicted community assignments) as above, that means $$\exists \epsilon > 0 : \mathbb{P}(|F_n-\bar{F_n}| \geq 1/2+\epsilon) \rightarrow_n 1.$$ To adapt this definition to SBMs with $k$ communities, the $1/2$ inside the probability changes to $1/k$.  
 \end{definition}
 
-A key thing to understand here is that the detection regime is not just a weaker regime, it is actually impossible to have exact recovery in some families of SBM graphs.  Consider for instance when the SBM is not connected. In that case, the isolated vertices would have underdetermined community membership.  See \ref{fig:sparse} for instance. Furthermore, achieving detection is not even possible for some families of SBMs as well.  The bulk of results in \cite{MNS} serve to address in what sparse regimes of the 2 community SBM can we only hope for partial recovery. They show this by proving in a very precise sense that correlating the a particular node's community membership with its neighbours is impossible, thus showing there is an information theoretic impossibility to even detection.  
+A key thing to understand here is that the detection regime is not just a weaker regime, it is actually impossible to have exact recovery for some families of $\{$SBM(n,p,q)$\}_n$.  Consider for instance when the SBM is not connected. In that case, the isolated vertices would have underdetermined community membership.  See \ref{fig:sparse} for a diagram of such an SBM. Furthermore, achieving detection of the true communities is not even possible for certain choices of $p,q$ of the  $\{$SBM(n,p,q)$\}_n$ as well.  The bulk of results in \cite{MNS} investigate what sparse regimes of the 2 community SBM can we only hope for partial recovery. They show this by proving in a very precise sense that correlating the a particular node's community membership with its neighbours is impossible, thus showing there is an information theoretic impossibility to even detection.  
 
 
 \begin{figure}[h]
@@ -108,51 +109,51 @@ $$ d_i := \sum_{j=1}^n w_{ij}.$$
 
 The degree matrix $D$ then is the diagonal matrix with entries $d_1, ..., d_n$ along its diagonal. Let $W$ be the adjacency matrix of $G$.  
 
-\begin{definition}\textit{ Unnormalized Graph Laplacian}\\
+\begin{definition}The \textit{unnormalized graph Laplacian} is defined as
 
-$L : = D-W$ 
+$L : = D-W.$ 
 \end{definition}
-\begin{definition}\textit{ Symmetric Graph Laplacian}\\
+\begin{definition}The \textit{symmetric graph Laplacian} is defined as
 
-$L_{sym} : = I - D^{-1/2}WD^{-1/2} = D^{-1/2}LD^{-1/2}$ 
+$L_{sym} : = I - D^{-1/2}WD^{-1/2} = D^{-1/2}LD^{-1/2}.$ 
 \end{definition}
-\begin{definition}\textit{ Random Walk Laplacian}\\
+\begin{definition}The \textit{random walk Laplacian} is defined as
 
-$L_{rw} : = I - D^{-1}W = D^{-1}L$ 
+$L_{rw} : = I - D^{-1}W = D^{-1}L.$ 
 \end{definition}
 
-The graph Laplacians enjoy some nice properties.  In particular: 
+The graph Laplacians above enjoy some nice properties.  In particular: 
 
-\begin{prop}\cite{tutorial_SC}
+\begin{prop}{\cite{tutorial_SC}}
 \begin{itemize}
     \item For every $v \in \mathbb{R}^n$ we have
-    $$v L v^T = \frac{1}{2}\sum_{i,j =1}^nw_{ij}(v_i-v_j)^2$$
+    $$v L v^T = \frac{1}{2}\sum_{i,j =1}^nw_{ij}(v_i-v_j)^2.$$
     \item $L$ is symmetric and positive semi-definite.
-    \item The smallest eigenvalue of $L$ is 0, the corresponding eigenvector is the constant one vector $\mathbb{1}$. $0$ is also an eigenvalue of of $L_{rw}$ and $L_{sym}$, corresponding to the constant one vector $\mathbb{1}$ and $D^{-1/2}$as eigenvectors respectively. 
+    \item The smallest eigenvalue of $L$ is 0, the corresponding eigenvector is the constant one vector \textbf{1}. $0$ is also an eigenvalue of of $L_{rw}$ and $L_{sym}$, corresponding to the constant one vector \textbf{1} and $D^{-1/2}$as eigenvectors respectively. 
     \item $L$ has $n$ non-negative, real-valued eigenvalues $0 = \lambda_1 \leq \lambda_2 \leq ...\leq \lambda_n$. 
 \end{itemize}
 \end{prop}
 
-All spectral clustering algorithms use some version of graph Laplacians, either one of the three classical ones above, or some version based on the above, and proceed in roughly the following steps.  
+ Spectral clustering algorithms generally use some version of graph Laplacians, either one of the three classical ones above, or some matrix that is a perturbation of a Laplacian.  We will discuss one such perturbation when we define the Bethe Hessian matrix in the next chapter.  As for the steps of a generic spectral clustering algorithm, it follows roughly the following steps.  
 
 \begin{algorithm}[H]
- \KwData{graph adjacency matrix $W$ corresponding to graph $G = (V, E)$, $k$=number of clusters desired}
- \KwResult{A clustering of the vertices $v$ into $k$ clusters}
+ \KwData{A graph adjacency matrix $W$ corresponding to graph $G = (V, E)$. Let $k$ be the number of clusters desired.}
+ \KwResult{A clustering of the vertices $v$ into $k$ clusters.  This can be encoded as a function $F: V \rightarrow \{1,2,...,k\}$.}
  \begin{enumerate}
-    \item Create $L$, $L_{sym}$, $L_{rw}$, $BH$...etc corresponding to $W$.  Call it $Q$. 
+    \item Create $L$, $L_{sym}$, $L_{rw}$ from $W$.  Let us call the matrix we are finding the spectrum of $Q$. 
     \item Take eigendecomposition of $Q$.  
-    \item Take the $k$-dim eigenspace associated with biggest/smallest eigenvalues.  Biggest if $L$, smallest if $L_{sym}$, $L_{rw}$.  
-    \item Project vertices $v \in V$ onto this $k$-dim subspace.
-    \item Do k-means on the projected points. 
+    \item Take the $k$ dimensional eigenspace associated with biggest or smallest eigenvalues of Q. Choose the eigenspace corresponding to the biggest eigenvalues if $Q = L$, and the eigenspace corresponding to the smallest eigenvalues if $Q= L_{sym}$ or $Q = L_{rw}$.  
+    \item Project the vertices $v \in V$ onto this $k$ dimensional subspace.
+    \item Perform the k-means algorithm on the projected vertices. 
     \item Done. 
  \end{enumerate}
  \caption{General Spectral Clustering Algorithm}
 \end{algorithm}
 
 
-Choosing what matrix to use for $Q$ is somewhat of an art in clustering problems, especially when it comes to applying it to real data.  In the case of generative models, we have a better understanding of what the cuts should look like (are we minimizing cuts while normalizing by volume?  Is our graph extremely sparse that the extreme eigenvalues exhibit large fluctuations?).  So in short, there are many versions of spectral algorithms that depend differ on what matrix the spectral algorithm is applied to.  A bulk of them is based on the Laplacian, some on other matrices we can derive from the adjacency matrix of a network. 
+Choosing what matrix to use for $Q$ is somewhat of an art in clustering problems, especially when it comes to applying it to real data.  In the case of generative models, we have a better understanding of what the cuts should look like.  Are we minimizing cuts while normalizing by volume?  Is our graph extremely sparse that the extreme eigenvalues exhibit large fluctuations?  In short, there are many versions of spectral algorithms that depend differ on what matrix the spectral algorithm is applied to.  A bulk of them is based on the Laplacian, some on other matrices we can derive from the adjacency matrix of a network. 
 
-One way of seeing how spectral clustering works is to regard the spectral decomposition as a particularly useful embedding of $v \in R^n$ (as represented by the adjacency matrix) to $\bar{v} \in R^k$ (where $k$ is how many clusters we want to extract).  The eigenbasis is informative because it provides us the most extreme directions that highlights where connections are most sparse (the eigenproblem is in fact a relaxation of min cut).  For instance, consider an instantiation of SBM($n =40, (p = 0.5, q = 0.05)$).  Here $k = 2$.  In \ref{fig:randomproj} and \ref{fig:spectralproj} we compare a random projection to $\mathbb{R}^2$ with a spectral projection.  
+One way of seeing how spectral clustering works is to regard the spectral decomposition as a particularly useful embedding of $v \in \mathbb{R}^n$ (as represented by the adjacency matrix) to $\bar{v} \in R^k$ (where $k$ is how many clusters we want to extract).  The eigenbasis is informative because it provides us the most extreme directions that highlights where connections are most sparse (the eigenproblem is in fact a relaxation of min cut).  For instance, consider an instantiation of SBM($n =40, (p = 0.5, q = 0.05)$).  Here $k = 2$.  In \ref{fig:randomproj} and \ref{fig:spectralproj} we compare a random projection of our vertex set to $\mathbb{R}^2$ with a projection using the spectral basis.  
 
 \begin{figure}[h]
 \minipage{0.4\textwidth}
@@ -169,12 +170,12 @@ One way of seeing how spectral clustering works is to regard the spectral decomp
 
 \section{Thresholds for Detectability and Exact Recovery}
 
-If we wish to talk about regimes of recovery, we need to use the constant degree parametrization so that we can talk about sparse and dense graphs.  In particular, in the two balanced community SBM model where we only need to specify $n$, $p$, and $q$, we reparametrize with $a :=  p \cdot n$ and $b := q \cdot n$.  Where $a, b$ are the average within-community and out-of-community average degrees respectively.  The regimes where exact recovery and detection can be made are the following. 
+If we wish to talk about regimes of recovery, we need to use the constant degree parametrization so that we can talk about sparse and dense graphs.  In particular, in the two balanced community SBM$(n,p, q)$ we can reparametrize with $a :=  p \cdot n$ and $b := q \cdot n$.  Where $a, b$ are the average within-community and out-of-community average degrees respectively.  The regimes where exact recovery and detection can be made are the following. 
 
 \begin{itemize}
     \item \textbf{Exact Recovery}:$p=\frac{alog(n)}{n}, q = \frac{b log(n)}{n}$.  Recovery if and only if $\frac{a+b}{2} \geq 1 + \sqrt{ab}$.
     \begin{itemize}
-        \item In \cite{MNS} Mossel, Neeman, and Sly provide a polynomial time algorithm that is capable of recovering the parameters in the exact recovery threshold (the threshold which they prove below which no algorithm can recover the communities).  The proof has three stages. First classical spectral clustering is to compute an initial guess. A “replica” stage is then used to reduce error by holding out subsets and repeating spectral clustering on remaining graph.  And finally, on a small number of uncertain labels, majority rule to refine their assignments. 
+        \item In \cite{MNS} Mossel, Neeman, and Sly provide a polynomial time algorithm that is capable of recovering the parameters in the exact recovery threshold (the threshold which they prove below which no algorithm can recover the communities).  The proof has three stages. First classical spectral clustering is to compute an initial guess. A replica stage is then used to reduce error by holding out subsets and repeating spectral clustering on remaining graph.  And finally, on a small number of uncertain labels, majority rule to refine their assignments. 
          \item Abbe, Bandeira and Hall show in \cite{ABH} that they can provide an algorithm using semi definite programming to achieve the state of the art in the same sparse regime as above. 
     \end{itemize}
     \item \textbf{Detection}: $p = \frac{a}{n}, q = \frac{b}{n}$.  Detection iff $(a-b)^2 > 2(a+b)$.
@@ -185,6 +186,7 @@ If we wish to talk about regimes of recovery, we need to use the constant degree
     \end{itemize}
    \end{itemize}
    
-This list serves to highlight several things.  First that the results are all very recent. And also that the results are not trivial, it took a lot of hard work and ingenuity from mathematicians, statisticians, physicists and theoretical computer scientists to prove them.  The proofs require tools form random matrix theory, the theory of branching processes, semi definite programming to name a few, so a fairly deep level of machinery and theory was required. Second, notice that in each regime there is a successful algorithm that can achieve the theoretical threshold with a spectral approach.  The only catch is what type of matrix to apply the spectral method to.  Thus the takeaway is that there is no one size fits all model. Clustering, even in the two community case of the SBM takes a lot of expertise to define the right kind of parameters and matrices whose spectrum will amplify the right signals given the regime of the SBM parameters.  
+This list serves to highlight several things.  First that the results are all very recent. And also that the results are not trivial, it took a lot of hard work and ingenuity from mathematicians, statisticians, physicists and theoretical computer scientists to prove them.  The proofs require tools form random matrix theory, the theory of branching processes and semi definite programming, to name a few, so a fairly deep level of machinery and theory was required. Also, notice that in each regime there is a successful algorithm that can achieve the theoretical threshold with a spectral approach.  The only catch is what type of matrix to apply the spectral method to.  Thus the takeaway is that there is no one size fits all model. Clustering, even in the two community case of the SBM takes a lot of expertise to define the right kind of parameters and matrices whose spectrum will amplify the right signals given the regime of the SBM parameters.  
 
-Given all this, the present work's contribution is the following.  We will design a neural network architecture that is expressive enough to approximate these spectral algorithms.  Show that it can replicate the state of the art in SBM regimes, especially noteworthy are the difficult sparse regimes where we graze the information theoretic threshold.  And finally, perhaps most importantly, show that these models can be applied successfully to real data, and provide a computationally efficient approach.  In sum, the goal of bringing neural networks to bear on the problem is to let gradient descent replace the "ingenuity" aspect of clustering.  We no longer need to meticulously choose the right matrices to apply spectral clustering to.  Gradient descent will learn the correct parameters, in a data driven way. 
+Given all this, the present work's contribution is the following.  We will design a neural network architecture that is expressive enough to approximate these spectral algorithms.  Show that it can replicate the state of the art in SBM regimes, especially noteworthy are the difficult sparse regimes where we graze the information theoretic threshold. % And finally, perhaps most importantly, show that these models can be applied successfully to real data, and provide a computationally efficient approach.
+In sum, the goal of bringing neural networks to bear on the problem is to let gradient descent replace the "ingenuity" aspect of clustering.  We no longer need to meticulously choose the right matrices to apply spectral clustering to.  Gradient descent will learn the correct parameters, in a data driven way. 

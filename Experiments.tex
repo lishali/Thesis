@@ -1,12 +1,12 @@
 \chapter{Experiments}
-\section{Artificial Datasets}
 
-\subsection{Spectral Clustering on the Bethe Hessian for the SBM}
+In this chapter we give the results of our experiments on the SBM.  
+\section{Spectral Clustering on the Bethe Hessian for the SBM}
 \begin{definition}The 
 \textit{Bethe Hessian} is a one parameter perturbation of the unnormalized graph Laplacian.  Let $D$ be the diagonal matrix of degree of graph $G$ and $\mathbb{I}$ be the identity matrix in $n$ dimensions (where $G$ has $n$ vertices).  We define the Bethe Hessian as a matrix that depends on $r \in \mathbb{R}$ as  $$BH(r) := (r^2-1)\mathbb{I} - rA +D.$$
 \end{definition}
 
-Saade et al. showed in \cite{AFL} that the Bethe Hessian was a competitive matrix to do spectral clustering on when close to the information theoretic threshold of detection of $a,b$ for the SBM.  It has the benefit of being easily computed from the adjacency matrix. Recall that the information theoretic threshold for SBM($n, a/n, b/n)$ occurs for bounded degree graphs $G$ when $(a-b)^2 = 2(a+b)$.  When $(a-b)^2 > 2(a+b)$ we can recover the communities, when $(a-b)^2 < 2(a+b)$ we cannot.  Saade et al. did an experiment to compare bounded degree graphs with average degree 3, and compared various spectral methods, as well as belief propagation with spectral clustering on the Bethe Hessian. The best $r$ to use for the Bethe Hessian was motivated by results in statistical physics, it was empirically shown to give good accuracy for $r$ equal to the root of the average degree of the graph in the case of the SBM, but in general requires one to solve an eigenproblem on the graph zeta function.  See \cite{AFL} for details. 
+Saade et al. showed in \cite{AFL} that the Bethe Hessian was a competitive matrix to do spectral clustering on when close to the information theoretic threshold of detection of the SBM.  It has the benefit of being easily computed from the adjacency matrix. Recall that the information theoretic threshold for SBM($n, a/n, b/n)$ occurs for bounded degree graphs $G$ when $(a-b)^2 = 2(a+b)$.  When $(a-b)^2 > 2(a+b)$ we can recover the communities, when $(a-b)^2 < 2(a+b)$ we cannot.  Saade et al. did an experiment to compare bounded degree graphs with average degree 3, and compared various spectral methods, as well as belief propagation with spectral clustering on the Bethe Hessian. The best $r$ to use for the Bethe Hessian was motivated by results in statistical physics. It was empirically shown to give good accuracy for $r$ equal to the root of the average degree of the graph in the case of the SBM, but in general requires one to solve an eigenproblem on the graph zeta function.  See \cite{AFL} for details. 
 
 \begin{figure}[h]
   \begin{center}
@@ -22,8 +22,7 @@ To be clear, the experimental task is as follows.
 \begin{itemize}
     \item Input: Adjacency matrices A (instantiated from specific $SBM(n,a/n, b/n)$). 
     \item The parameter to be learned via gradient descent is $r$ of $BH(r)$. 
-    \item Output: A community assignment of vertices ($F : V \rightarrow \{0,1\}$. 
-    
+    \item Output: A community assignment of vertices : $F : V \rightarrow \{0,1\}$. 
 \end{itemize}
 
 The model was able to decrease loss, converge and get close to the theoretically verified optimal $r$. 
@@ -90,7 +89,7 @@ For the main experiment, we consider a GNN with the structure shown in figure \r
 In figure \ref{fig:GNN}, our input is $F\in \mathbb{R}^{n \times k}$ where $n$ is the number of nodes and $k$ is the dimension of the signal.  In a clustering problem, $k$ can be the number of communities we want to detect, where $\mathbb{R}^{n\times k}$ is a one-hot encoding of the clustering (an encoding where a categorical vector with $k$ categories is replaced with $k$ column vectors where each entry is 1 if it is in the category and 0 otherwise). At each layer, the input signal $F$ is transformed via a convolution applied to the following array of operators:  $[Iden, A, A^2, D]$.  $Iden$ is the identity matrix the size of the graph adjacency matrix.  $A$ is the graph adjacency matrix.  And $D$ is a matrix with the degree of each vertex on its diagonal (and zeros everywhere else). 
 
 In the language of operators introduced in the previous section, each layer we have the following $$ F_1^{n+1} = \eta(Iden \cdot F^n, A \cdot F^n, A^2 \cdot F^n, D \cdot F^n)$$ and $$ F_2^{n+1} = Relu \circ \eta(Iden \cdot F^n, A \cdot F^n, A^2 \cdot F^n, D \cdot F^n)$$ and $$ F^{n+1} = F_1^{n+1}+F_2^{n+2}$$
-where $\eta$ is a spatial convolution and $Relu(x) := max(0, x)$ (Relu applied to vectors would be Relu applied elementwise).  For our network applied to the SBM, we used 16 channels per layer, and 20 layers for a 1000 node graph. In the first layer each layer we apply a $k \times 4$ convolution to each of the 16 output channels.  The number of communities is given by $k$.  The final layer outputs to $k$ channels, to correspond to the $k$ dimensional one hot encoding of the community labels. We furthermore normalize and center after each layer for stability.  
+where $\eta$ is a spatial convolution and $Relu(x) := max(0, x)$ (Relu applied to vectors is just Relu applied elementwise).  For our network applied to the SBM, we used 16 channels per layer, and 20 layers for a 1000 node graph. In the first layer each layer we apply a $k \times 4$ convolution to each of the 16 output channels.  The number of communities is given by $k$.  The final layer outputs to $k$ channels, to correspond to the $k$ dimensional one hot encoding of the community labels. We furthermore normalize and center after each layer for stability.  
 
 The accuracy measure is given by the overlap. 
 \begin{definition}The \textit{Overlap} between a true community label $g: V \rightarrow V$ where $g(u) := g_u$, and the predicted community label $\bar{g}:V \rightarrow V$ where $\bar{g}(u) := \bar{g_u}$, is given by
